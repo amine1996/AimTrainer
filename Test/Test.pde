@@ -65,44 +65,24 @@ void draw()
 
     rt = map(stick.getSlider("RT").getValue(), -1, 1, -1, 1);
       
+    //Translation
     if(abs(joyX) > 0.1 || abs(joyY) > 0.1)
-    {      
-      PVector pos = arrayToPVector(camPlayer.position());
-      PVector target = arrayToPVector(camPlayer.target());
-      PVector attitude = arrayToPVector(camPlayer.attitude());
+    {
+      PVector oldTarget = arrayToPVector(camPlayer.target());
       
-      println(attitude);
-      camPlayer.jump(pos.x+joyX,pos.y,pos.z+joyY);
-      camPlayer.aim(target.x+joyX,target.y,target.z+joyY);
+      camPlayer.truck(joyX);
+      camPlayer.dolly(joyY);
+         
+      PVector newPos = arrayToPVector(camPlayer.position());
+      PVector newTarget = arrayToPVector(camPlayer.target());
       
-      float xpos = pos.x;
-      float zpos = pos.z;
-      if(joyX < 0)
-      {
-        xpos -= sin(attitude.x - radians(90));
-        zpos -= cos(attitude.x - radians(90));
-      }
-      if(joyX > 0)
-      {
-        xpos += sin(attitude.x - radians(90));
-        zpos += cos(attitude.x - radians(90));
-      }
-      if(joyY < 0)
-      {
-        xpos -= sin(attitude.x );
-        zpos -= cos(attitude.x );
-      }
-      if(joyY > 0)
-      {
-        xpos += sin(attitude.x );
-        zpos += cos(attitude.x);
-      }
+      camPlayer.jump(newPos.x,0,newPos.z);
+      camPlayer.aim(newTarget.x,oldTarget.y,newTarget.z);
     }
     
+    //Camera sight
     if(abs(joyRX) > 0.1 || abs(joyRY) > 0.1)
-    {
-      PVector target = arrayToPVector(camPlayer.target());
-            
+    { 
       float angleX = radians(joyRX) * 2.0;
       float angleY = radians(joyRY) * 2.0;
       
