@@ -1,0 +1,7 @@
+Shadow maker
+X	X position	3	SLIDER	x	0	1.0	0.0
+Y	Y position	3	SLIDER	y	0	1.0	0.0
+RX	RX position	3	SLIDER	rx	0	1.0	0.0
+RY	RY position	3	SLIDER	ry	0	1.0	0.0
+RT	Shoot	3	SLIDER	rz	0	1.0	0.2
+
