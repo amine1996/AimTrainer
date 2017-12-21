@@ -5,7 +5,7 @@ import org.gamecontrolplus.*;
 import net.java.games.input.*;
 
 PShape sphere;
-final float sphereRadius = 300;
+final float sphereRadius = 100;
 final PVector spherePos = new PVector(0,10,0);
 
 damkjer.ocd.Camera camPlayer;
@@ -21,7 +21,7 @@ ControlDevice stick;
 
 void setup()
 {
-  size(displayWidth, displayHeight, P3D); 
+  size(1920,1080,P3D);
 
   skyDome = loadImage("./data/Sky019.jpg");
   
@@ -36,12 +36,12 @@ void setup()
   PVector posPlayer = new PVector(0,0,0);
   PVector targetPlayer = new PVector(0,0,-sphereRadius/2);
   PVector upVectorPlayer = new PVector(0,1,0);
-  camPlayer = createCamera(posPlayer,targetPlayer,upVectorPlayer,70,1,1000);
+  camPlayer = createCamera(posPlayer,targetPlayer,upVectorPlayer,1,2,1000);
   
   PVector posSpectator = new PVector(0,-sphereRadius/2,0);
   PVector targetSpectator = new PVector(0,0,0.0001);
   PVector upVectorSpectator = new PVector(0,1,0);
-  camSpectator = createCamera(posSpectator, targetSpectator,upVectorSpectator,70,1,1000);
+  camSpectator = createCamera(posSpectator, targetSpectator,upVectorSpectator,2,1,1000);
  
  
   mainCam = camPlayer;
@@ -49,7 +49,7 @@ void setup()
 
 damkjer.ocd.Camera createCamera(PVector pos, PVector target, PVector upVector, float fov, float near, float far)
 {
-  return new damkjer.ocd.Camera(this,pos.x,pos.y,pos.z,target.x,target.y,target.z,upVector.x,upVector.y,upVector.z,fov,near,far);
+  return new damkjer.ocd.Camera(this,pos.x,pos.y,pos.z,target.x,target.y,target.z,fov,near,far);
 }
 
 void draw()
@@ -65,24 +65,44 @@ void draw()
 
     rt = map(stick.getSlider("RT").getValue(), -1, 1, -1, 1);
       
-    //Translation
     if(abs(joyX) > 0.1 || abs(joyY) > 0.1)
-    {
-      PVector oldTarget = arrayToPVector(camPlayer.target());
+    {      
+      PVector pos = arrayToPVector(camPlayer.position());
+      PVector target = arrayToPVector(camPlayer.target());
+      PVector attitude = arrayToPVector(camPlayer.attitude());
       
-      camPlayer.truck(joyX);
-      camPlayer.dolly(joyY);
-         
-      PVector newPos = arrayToPVector(camPlayer.position());
-      PVector newTarget = arrayToPVector(camPlayer.target());
+      println(attitude);
+      camPlayer.jump(pos.x+joyX,pos.y,pos.z+joyY);
+      camPlayer.aim(target.x+joyX,target.y,target.z+joyY);
       
-      camPlayer.jump(newPos.x,0,newPos.z);
-      camPlayer.aim(newTarget.x,oldTarget.y,newTarget.z);
+      float xpos = pos.x;
+      float zpos = pos.z;
+      if(joyX < 0)
+      {
+        xpos -= sin(attitude.x - radians(90));
+        zpos -= cos(attitude.x - radians(90));
+      }
+      if(joyX > 0)
+      {
+        xpos += sin(attitude.x - radians(90));
+        zpos += cos(attitude.x - radians(90));
+      }
+      if(joyY < 0)
+      {
+        xpos -= sin(attitude.x );
+        zpos -= cos(attitude.x );
+      }
+      if(joyY > 0)
+      {
+        xpos += sin(attitude.x );
+        zpos += cos(attitude.x);
+      }
     }
     
-    //Camera sight
     if(abs(joyRX) > 0.1 || abs(joyRY) > 0.1)
-    { 
+    {
+      PVector target = arrayToPVector(camPlayer.target());
+            
       float angleX = radians(joyRX) * 2.0;
       float angleY = radians(joyRY) * 2.0;
       
