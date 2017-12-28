@@ -97,6 +97,30 @@ void draw()
       camPlayer.pan(angleX);
       camPlayer.tilt(angleY);
     }
+    
+    // Shoot
+    if (rt > 0) {
+      float[] position = camPlayer.position();
+      println("Position X: " + position[0]);
+      println("Position Y: " + position[1]);
+      println("Position Z: " + position[2]);
+      
+      float[] target = camPlayer.target();
+      println("Target X: " + target[0]);
+      println("Target Y: " + target[1]);
+      println("Target Z: " + target[2]);
+      
+      // Récupérer un tableau de cibles avec coordonnée (x, y, z)
+      // foeach(cibles as cible) {
+      //   deltaZ = abs(cible.z - position.z)
+      //   espilon = abs(cible.z - position.z) / abs(maxZ - position.z) * COEFF // définir le coeff en testant...
+      //
+      //   if (abs(cible.x - position.x) <= espilon && abs(cible.y - position.y) <= espilon) {
+      //     // Cible touchée
+      //     // Incrémenter le score et détruire la cible
+      //    }
+      // }
+    }
   }
   
   PVector attitude = arrayToPVector(camPlayer.attitude());
