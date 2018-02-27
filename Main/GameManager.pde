@@ -84,10 +84,10 @@ class GameManager
   public void createAimSphere(PVector pos)
   { 
     if(inSphere(pos,Config.aimRadius))
-      aimList.add(new Aim(pos.copy()));
+      this.aimList.add(new Aim(pos.copy()));
     else
     {
-      logger.log("Sphere outside radius");
+      this.logger.log("Sphere outside radius");
     }
   }
   
@@ -144,7 +144,7 @@ class GameManager
   //Remove the aim given in parameter from the aimList
   private void destroySphere(Aim aim)
   {
-    aimList.remove(aimList.indexOf(aim));
+    this.aimList.remove(aimList.indexOf(aim));
   }
   
   //Return the attitude (yaw,pitch,roll) vector that is looking at the position given in parameter
@@ -182,11 +182,11 @@ class GameManager
     
     if(inSphere(spherePos,Config.aimRadius))
     {
-      aimList.add(new Aim(spherePos));
+      this.aimList.add(new Aim(spherePos));
     }
     else
     {
-      logger.log("Sphere outside radius, recreating one");
+      this.logger.log("Sphere outside radius, recreating one");
       createRandomAimSphere();
     }
   } //<>// //<>// //<>// //<>// //<>//
@@ -252,10 +252,10 @@ class GameManager
   //Draw the world sphere
   private void drawWorldSphere()
   {
-    this.appInstance.pushMatrix();
+    pushMatrix();
       translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
-      this.appInstance.shape(this.worldSphere);
-    this.appInstance.popMatrix();
+      shape(this.worldSphere);
+    popMatrix();
   }
   
   //Draw the crosshair
@@ -265,32 +265,32 @@ class GameManager
     final PVector attitude = this.camManager.getPlayerAttitude();
     
     pushMatrix();
-        //Positionne la croix sur la caméra
-        translate(pos.x, pos.y, pos.z);
-        //Rotation par rapport à l'axe Y
-        rotateY(attitude.x);  
-        //Rotation par rapport à l'axe X
-        rotateX(-attitude.y);
-        //Pousse la croix de 2 en Z
-        translate(0, 0, -2);
+      //Positionne la croix sur la caméra
+      translate(pos.x, pos.y, pos.z);
+      //Rotation par rapport à l'axe Y
+      rotateY(attitude.x);  
+      //Rotation par rapport à l'axe X
+      rotateX(-attitude.y);
+      //Pousse la croix de 2 en Z
+      translate(0, 0, -2);
       
-        //Dessine la croix
-        fill(0);
-        stroke(255,0,0);
-        strokeWeight(1);
-        line(-0.1,0,0.1,0);
-        line(0,-0.1,0,0.1);
-      popMatrix();
+      //Dessine la croix
+      fill(0);
+      stroke(255,0,0);
+      strokeWeight(1);
+      line(-0.1,0,0.1,0);
+      line(0,-0.1,0,0.1);
+    popMatrix();
   }
 
   //Draw the floor
   private void drawFloor()
   {
-     pushMatrix();
-        fill(255);
-        translate(0,10,0);
-        rotateX(radians(90));
-        ellipse(0,0,Config.sphereRadius*2,Config.sphereRadius*2);
+    pushMatrix();
+      fill(255);
+      translate(0,10,0);
+      rotateX(radians(90));
+      ellipse(0,0,Config.sphereRadius*2,Config.sphereRadius*2);
     popMatrix();
   }
 }

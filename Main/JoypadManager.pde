@@ -121,7 +121,7 @@ class JoypadManager
     
     if(this.buttonShoot > 0 && buttonShootNow == 0)
     {
-      logger.log("Clicked shoot button",true);
+      this.logger.log("Clicked shoot button",true);
       this.shootClicked = true;
     }
     else

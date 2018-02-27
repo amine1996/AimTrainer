@@ -47,7 +47,7 @@ class Aim
   //Return a vector representing the sphere
   public PVector getColor()
   {
-    return aimColor;
+    return this.aimColor;
   }
   
   //Fill sphere with color c

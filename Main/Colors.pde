@@ -1,6 +1,6 @@
 import java.util.Random;
 
-//Enum representing joypad colors
+//Enum representing oypad colors
 public enum Colors
 {
   NONE,
