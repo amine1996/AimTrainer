@@ -6,18 +6,24 @@ import java.util.Random;
 
 class GameManager
 {
-  PApplet appInstance;
+  //instance of main PApplet
+  private PApplet appInstance;
   
+  //PShape representing the world sphere
   private PShape worldSphere;
   
+  //List of aim in the world
   private ArrayList<Aim> aimList;
   
+  //Used to handle cameras
   private CameraManager camManager;
   
+  //Ued to handle the joystick
   private JoypadManager joyManager;
   
   private Logger logger;
   
+  //GameManager constructor initalised with instance of main PApplet
   GameManager(Main pInstance)
   {
     this.appInstance = pInstance;
@@ -33,6 +39,9 @@ class GameManager
     this.logger = new Logger("GameManager");
   }
   
+  //Public methods
+  
+  //Update all components of the game manager and draw 3D Models
   public void update()
   {
 
@@ -71,7 +80,21 @@ class GameManager
     }
   }
   
-  public Aim currentTarget()
+  
+  public void createAimSphere(PVector pos)
+  { 
+    if(inSphere(pos,Config.aimRadius))
+      aimList.add(new Aim(pos.copy()));
+    else
+    {
+      logger.log("Sphere outside radius");
+    }
+  }
+  
+  //Private methods
+  
+  //Get current aim the player is looking at or null if he looks in the void
+  private Aim currentTarget()
   {
     float minDist = MAX_FLOAT;
     PVector playerPos = this.camManager.getPlayerPos();
@@ -96,7 +119,8 @@ class GameManager
     return currentTarget;
   }
   
-  public boolean isLookingAtSphere(Aim aim)
+  //Returns true if the player is looking at the sphere given in parameter
+  private boolean isLookingAtSphere(Aim aim)
   {
 
     final PVector playerPos = this.camManager.getPlayerPos();
@@ -111,17 +135,20 @@ class GameManager
     return abs(PVector.add(playerPos,PVector.mult(playerDir,playerToSphere.mag())).dist(spherePos)) < aim.getRadius();
   }
 
+  //Return true if the position given in parameter is within the world sphere, with a delta to position if necessary
   private boolean inSphere(PVector pos, float delta)
   {
     return pow(Config.spherePos.x - pos.x,2) + pow(Config.spherePos.y - pos.y,2) + pow(Config.spherePos.z - pos.z,2) < pow(Config.sphereRadius - delta,2);
   }
   
+  //Remove the aim given in parameter from the aimList
   private void destroySphere(Aim aim)
   {
     aimList.remove(aimList.indexOf(aim));
   }
   
-  public PVector getAttitudeToPos(PVector pos)
+  //Return the attitude (yaw,pitch,roll) vector that is looking at the position given in parameter
+  private PVector getAttitudeToPos(PVector pos)
   {
     final PVector playerPos = this.camManager.getPlayerPos();
     final PVector lookAt = pos;
@@ -134,7 +161,8 @@ class GameManager
     return correctAtt;
   }
   
-  public void createRandomAimSphere()
+  //Create a random aim sphere within the sphere with a random color
+  private void createRandomAimSphere()
   { 
     //https://math.stackexchange.com/questions/1585975/how-to-generate-random-points-on-a-sphere
     
@@ -161,60 +189,9 @@ class GameManager
       logger.log("Sphere outside radius, recreating one");
       createRandomAimSphere();
     }
-  }
+  } //<>// //<>// //<>// //<>// //<>//
   
-  public void createAimSphere(PVector pos)
-  { 
-    if(inSphere(pos,Config.aimRadius))
-      aimList.add(new Aim(pos.copy()));
-    else
-    {
-      logger.log("Sphere outside radius");
-    }
-  }
-  
-  public void drawWorldSphere()
-  {
-    this.appInstance.pushMatrix();
-      translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
-      this.appInstance.shape(this.worldSphere);
-    this.appInstance.popMatrix();
-  }
-  
-  public void drawCrossHair()
-  {
-    final PVector pos = this.camManager.getPlayerPos();
-    final PVector attitude = this.camManager.getPlayerAttitude();
-    
-    pushMatrix();
-        //Positionne la croix sur la caméra //<>//
-        translate(pos.x, pos.y, pos.z);
-        //Rotation par rapport à l'axe Y
-        rotateY(attitude.x);  
-        //Rotation par rapport à l'axe X
-        rotateX(-attitude.y);
-        //Pousse la croix de 2 en Z //<>//
-        translate(0, 0, -2);
-      
-        //Dessine la croix //<>//
-        fill(0);
-        stroke(255,0,0);
-        strokeWeight(1); //<>//
-        line(-0.1,0,0.1,0);
-        line(0,-0.1,0,0.1);
-      popMatrix();
-  }
-
-  public void drawFloor()
-  {
-     pushMatrix();
-        fill(255); //<>//
-        translate(0,10,0);
-        rotateX(radians(90));
-        ellipse(0,0,Config.sphereRadius*2,Config.sphereRadius*2);
-    popMatrix();
-  }
-  
+  //Move the player's camera using the joystick values
   private void handleTranslation()
   {
     final PVector leftJoy = this.joyManager.getLeftJoy();
@@ -242,6 +219,7 @@ class GameManager
     }
   }
  
+  //Move the sight of the player's camera depend on the joystick values
   private void handleSight()
   {
     final PVector rightJoy = this.joyManager.getRightJoy();
@@ -258,7 +236,7 @@ class GameManager
   }
 
   //3D methods
-  PShape createWorldSphere()
+  private PShape createWorldSphere()
   {
     PImage skyDome = loadImage("./data/Sky019.jpg");
     
@@ -268,5 +246,51 @@ class GameManager
     sphere.setTexture(skyDome);
     
     return sphere;
+  }
+
+  
+  //Draw the world sphere
+  private void drawWorldSphere()
+  {
+    this.appInstance.pushMatrix();
+      translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
+      this.appInstance.shape(this.worldSphere);
+    this.appInstance.popMatrix();
+  }
+  
+  //Draw the crosshair
+  private void drawCrossHair()
+  {
+    final PVector pos = this.camManager.getPlayerPos();
+    final PVector attitude = this.camManager.getPlayerAttitude();
+    
+    pushMatrix();
+        //Positionne la croix sur la caméra
+        translate(pos.x, pos.y, pos.z);
+        //Rotation par rapport à l'axe Y
+        rotateY(attitude.x);  
+        //Rotation par rapport à l'axe X
+        rotateX(-attitude.y);
+        //Pousse la croix de 2 en Z
+        translate(0, 0, -2);
+      
+        //Dessine la croix
+        fill(0);
+        stroke(255,0,0);
+        strokeWeight(1);
+        line(-0.1,0,0.1,0);
+        line(0,-0.1,0,0.1);
+      popMatrix();
+  }
+
+  //Draw the floor
+  private void drawFloor()
+  {
+     pushMatrix();
+        fill(255);
+        translate(0,10,0);
+        rotateX(radians(90));
+        ellipse(0,0,Config.sphereRadius*2,Config.sphereRadius*2);
+    popMatrix();
   }
 }

@@ -8,16 +8,20 @@ class JoypadManager
   private ControlIO joypadControl;
   private ControlDevice joypadInputs;
   
+  //Vector representing joystick values (x,y)
   private PVector leftJoy;
   private PVector rightJoy;
   
+  //Boolean representing button states (pressed, released)
   private boolean buttonY;
   private boolean buttonX;
   private boolean buttonA;
   private boolean buttonB; 
   
+  //Float representing the shoot button value (depending on how much it's pressed)
   private float buttonShoot;
   
+  //True if the shoot button has been clicked (Pressed then released)
   private boolean shootClicked;
   
   private Logger logger;
@@ -39,21 +43,25 @@ class JoypadManager
     this.shootClicked = false;
   }
   
+  //Return false if on the ControlIO object is null
   public boolean isEmpty()
   {
     return (this.joypadControl == null || this.joypadInputs == null);
   }
   
+  //Return value of right joystick
   public PVector getRightJoy()
   {
     return this.rightJoy;
   }
   
+  //Returns value of the left joystick
   public PVector getLeftJoy()
   {
     return this.leftJoy;
   }
   
+  //Returns a PVector(r,g,b) representing the color pressed by the user
   public PVector getAdditiveColorPressed()
   {
     ArrayList<Colors> colors = new ArrayList<Colors>();
@@ -83,16 +91,19 @@ class JoypadManager
     return ColorMaker.colorAddition(colors);
   }
   
+  //Return the value of the shoot button
   public float getShootButton()
   {
     return this.buttonShoot;
   }
   
+  //Return the value of the shootClicked boolean (True if button has been pressed then released)
   public boolean shootClicked()
   {
     return this.shootClicked;
   }
   
+  //Update the joystick components
   public void update()
   {
     this.leftJoy.x = map(this.joypadInputs.getSlider("X").getValue(), -1, 1, -1, 1);

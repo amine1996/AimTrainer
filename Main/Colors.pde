@@ -1,6 +1,6 @@
 import java.util.Random;
 
-//Joypad colors
+//Enum representing joypad colors
 public enum Colors
 {
   NONE,
@@ -10,16 +10,20 @@ public enum Colors
   YELLOW
 }
 
+//Static class used to create color and additive colors
 public static class ColorMaker
 {
+  //Used to generate random numbers
   private static final Random randomGenerator = new Random();
+  
+  //Color value when creating color
   private static final int colorValue = 200;
   
+  //Return ArrayList of colors
   public static ArrayList<Colors> getColors()
   {
     ArrayList<Colors> allColors = new ArrayList<Colors>();
     
-    //Remove yellow because additive
     allColors.add(Colors.NONE);
     allColors.add(Colors.BLUE);
     allColors.add(Colors.GREEN);
@@ -29,21 +33,25 @@ public static class ColorMaker
     return allColors;  
   }
   
+  //Return color blue as a PVector
   public static PVector getBlue()
   {
     return new PVector(0,0,colorValue);
   }
   
+  //Return color green as a PVector
   public static PVector getGreen()
   {
     return new PVector(0,colorValue,0);
   }
   
+  //Return color red as a PVector
   public static PVector getRed()
   {
     return new PVector(colorValue,0,0);
   }
   
+  //Return a addition of two random colors
   public static PVector getRandomAdditiveColor()
   {
     ArrayList<Colors> colors = getColors();
@@ -66,7 +74,7 @@ public static class ColorMaker
     return colorAddition(addition);
   }
   
-  
+  //Add N colors and return a PVector containing the result
   public static PVector colorAddition(ArrayList<Colors> colors)
   {
     PVector additiveColors = new PVector(0,0,0);

@@ -14,8 +14,10 @@ class CameraManager
   //Cam that will be used to feed the screen
   private damkjer.ocd.Camera mainCam;
   
+  //Used to log text to console output
   private Logger logger;
   
+  //Constructor initalised with main PApplet
   CameraManager(PApplet pInstance)
   {
     this.appInstance = pInstance;
@@ -44,6 +46,7 @@ class CameraManager
     return Utilities.arrayToPVector(this.playerCam.target());
   }
   
+  //Calculate direction of the player
   public PVector getPlayerDirection()
   {
     return getPlayerPos().sub(getPlayerTarget()).normalize().mult(-1);
@@ -81,6 +84,8 @@ class CameraManager
   }
   
   //Private methods
+  
+  //Create player camera with default settings
   private damkjer.ocd.Camera createPlayerCamera()
   {
     final PVector posPlayer = new PVector(0,0,0);
@@ -90,6 +95,7 @@ class CameraManager
     return createCamera(posPlayer,targetPlayer,upVectorPlayer,70,1,1000);
   }
   
+  //Create spectator camera with default settings
   private damkjer.ocd.Camera createSpectatorCamera()
   {
     final PVector posSpectator = new PVector(0,-Config.sphereRadius/2,0);
@@ -99,6 +105,7 @@ class CameraManager
     return createCamera(posSpectator, targetSpectator,upVectorSpectator,70,1,1000);
   }
   
+  //Return camera object initalised with parameters
   private damkjer.ocd.Camera createCamera(PVector pos, PVector target, PVector upVector, float fov, float near, float far)
   {
     return new damkjer.ocd.Camera(this.appInstance,pos.x,pos.y,pos.z,target.x,target.y,target.z,upVector.x,upVector.y,upVector.z,fov,near,far);

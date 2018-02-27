@@ -11,6 +11,7 @@ void draw()
 {
   background(100,100,100);
 
+  //Update GameManager and draw 3D Models
   this.gameManager.update();
 }
 
@@ -18,7 +19,6 @@ void keyPressed()
 {
   if(key == 'a')
   {
-    //this.camManager.setPlayerCamAsMain();
     this.gameManager.createRandomAimSphere();
   }
 }
