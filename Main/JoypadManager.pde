@@ -1,4 +1,3 @@
-import org.gamecontrolplus.gui.*;
 import org.gamecontrolplus.*;
 
 class JoypadManager

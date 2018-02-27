@@ -1,9 +1,3 @@
-import damkjer.ocd.*;
-
-import net.java.games.input.*;
-
-import java.util.Random;
-
 class GameManager
 {
   //instance of main PApplet

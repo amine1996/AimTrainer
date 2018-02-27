@@ -21,7 +21,7 @@ class CameraManager
   CameraManager(PApplet pInstance)
   {
     this.appInstance = pInstance;
-    
+      
     this.playerCam = createPlayerCamera();
     this.spectatorCam = createSpectatorCamera();
     
