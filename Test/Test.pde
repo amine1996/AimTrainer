@@ -69,15 +69,23 @@ void draw()
     if(abs(joyX) > 0.1 || abs(joyY) > 0.1)
     {
       PVector oldTarget = arrayToPVector(camPlayer.target());
+      PVector oldPos = arrayToPVector(camPlayer.position());
       
       camPlayer.truck(joyX);
-      camPlayer.dolly(joyY);
-         
+      camPlayer.dolly(joyY); 
+        
       PVector newPos = arrayToPVector(camPlayer.position());
-      PVector newTarget = arrayToPVector(camPlayer.target());
       
-      camPlayer.jump(newPos.x,0,newPos.z);
-      camPlayer.aim(newTarget.x,oldTarget.y,newTarget.z);
+      if((( spherePos.x-newPos.x )*( spherePos.x-newPos.x ) + (spherePos.y-newPos.y)*(spherePos.y-newPos.y) + (spherePos.z-newPos.z)*(spherePos.z-newPos.z)) < ((sphereRadius - 20) * (sphereRadius - 20)) )
+      {        
+        PVector newTarget = arrayToPVector(camPlayer.target());
+        camPlayer.jump(newPos.x,0,newPos.z);
+        camPlayer.aim(newTarget.x,oldTarget.y,newTarget.z);
+      }
+      else{
+        camPlayer.truck(-joyX);
+        camPlayer.dolly(-joyY); 
+      }
     }
     
     //Camera sight
@@ -97,8 +105,8 @@ void draw()
   //Cube that represent camera
   pushMatrix();
     translate(0,0,0);
-    rotateY(attitude.x);
-    rotateX(attitude.z);
+    //rotateY(attitude.x);
+    //rotateX(attitude.z);
     drawCube();
   popMatrix();
   
@@ -106,34 +114,34 @@ void draw()
     translate(spherePos.x,spherePos.y,spherePos.z);
     shape(sphere);
   popMatrix();
- 
+  
+   //Affiche le flux de la main cam
+  mainCam.feed();
+  
   pushMatrix();
-    //Positionne le cube sur la caméra
+    //Positionne la croix sur la caméra //<>//
     translate(pos.x, pos.y, pos.z);
     //Rotation par rapport à l'axe Y
     rotateY(attitude.x);  
     //Rotation par rapport à l'axe X
     rotateX(-attitude.y);
-    //Pousse la croix de 10 en Z
-    translate(0, 0, -10);
+    //Pousse la croix de 10 en Z //<>//
+    translate(0, 0, -2);
   
-    //Dessine la croix
+    //Dessine la croix //<>//
     fill(0);
     stroke(255,0,0);
-    strokeWeight(2);
-    line(-0.5,0,0.5,0);
-    line(0,-0.5,0,0.5);
+    strokeWeight(1); //<>//
+    line(-0.1,0,0.1,0);
+    line(0,-0.1,0,0.1);
   popMatrix();
   
   pushMatrix();
-    fill(255);
+    fill(255); //<>//
     translate(0,10,0);
     rotateX(radians(90));
     ellipse(0,0,sphereRadius*2,sphereRadius*2);
   popMatrix();
-  
-  //Affiche le flux de la main cam
-  mainCam.feed();
 }
 
 PVector arrayToPVector(float[] array)
