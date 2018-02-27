@@ -1,0 +1,10 @@
+Shadow maker
+X	X position	3	SLIDER	x	0	1.0	0.0
+Y	Y position	3	SLIDER	y	0	1.0	0.0
+RX	RX position	3	SLIDER	rx	0	1.0	0.0
+RY	RY position	3	SLIDER	ry	0	1.0	0.0
+RT	Shoot	3	SLIDER	rz	0	1.0	0.2
+BY	Button Y	1	BUTTON	Y	0	0.0	0.0
+BX	Button X	1	BUTTON	X	0	0.0	0.0
+BB	Button B	1	BUTTON	B	0	0.0	0.0
+BA	Button A	1	BUTTON	A	0	0.0	0.0
