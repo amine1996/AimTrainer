@@ -6,8 +6,6 @@ class GameManager
   //PShape representing the world sphere
   private PShape skySphere;
   
-  private PShape transparentSphere;
-  
   //List of aim in the world
   private ArrayList<Aim> aimList;
   
@@ -33,8 +31,6 @@ class GameManager
     this.aimList = new ArrayList<Aim>();
     
     this.skySphere = createskySphere();
-
-    this.transparentSphere = createTransparentSphere();
     
     this.camManager = new CameraManager(this.appInstance);
     
@@ -126,17 +122,6 @@ class GameManager
       }
       
       drawScore();
-    }
-  }
-  
-  
-  public void createAimSphere(PVector pos)
-  { 
-    if(inSphere(pos,Config.aimRadius))
-      this.aimList.add(new Aim(pos.copy()));
-    else
-    {
-      this.logger.log("Sphere outside radius");
     }
   }
   
@@ -302,16 +287,6 @@ class GameManager
     
     return sphere;
   }
-
-  private PShape createTransparentSphere()
-  {
-    sphereDetail(100);
-    noStroke();
-    PShape sphere = createShape(SPHERE,Config.skySphereRadius);
-    sphere.setFill(color(0,0,200,0));
-    
-    return sphere;
-  }
   
   //Draw the sky sphere
   private void drawskySphere()
@@ -319,15 +294,6 @@ class GameManager
     pushMatrix();
       translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
       shape(this.skySphere);
-    popMatrix();
-  }
-  
-  //Draw the transparent sphere
-  private void drawTransparentSphere()
-  {
-    pushMatrix();
-      translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
-      shape(this.transparentSphere);
     popMatrix();
   }
   

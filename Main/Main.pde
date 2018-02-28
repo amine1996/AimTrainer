@@ -14,11 +14,3 @@ void draw()
   //Update GameManager and draw 3D Models
   this.gameManager.update();
 }
-
-void keyPressed()
-{
-  if(key == 'a')
-  {
-    this.gameManager.createRandomAimSphere();
-  }
-}

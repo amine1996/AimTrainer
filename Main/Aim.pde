@@ -41,11 +41,13 @@ class Aim
     this.position = pPos;
   }
   
+  //Return when the sphere spawned
   public int getSpawnTime()
   {
     return this.spawnTime;
   }
   
+  //Return true if the sphere has lived for more than 5 seconds
   public boolean isDead()
   {
     return millis() - this.spawnTime > Config.aimLifespan * 1000;
