@@ -18,5 +18,5 @@ static class Config
   //Logger delay between two logs if same object (In seconds)
   final static int loggerDelay = 5;
   
-  final static int aimLifespan = 10;
+  final static int aimLifespan = 5;
 }

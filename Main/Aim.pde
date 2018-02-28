@@ -46,6 +46,11 @@ class Aim
     return this.spawnTime;
   }
   
+  public boolean isDead()
+  {
+    return millis() - this.spawnTime > Config.aimLifespan * 1000;
+  }
+  
   //Fill the sphere with a random color
   public void setRandomColor()
   {

@@ -21,6 +21,10 @@ class GameManager
   
   private int score;
   
+  private GameState gameState;
+  
+  private PieMenu pieMenu;
+  
   //GameManager constructor initalised with instance of main PApplet
   GameManager(Main pInstance)
   {
@@ -40,7 +44,9 @@ class GameManager
     
     this.score = 0;
     
-    createRandomAimSphere();
+    this.gameState = GameState.MENU;
+    
+    this.pieMenu = new PieMenu(this.joyManager);
   }
   
   //Public methods
@@ -48,43 +54,79 @@ class GameManager
   //Update all components of the game manager and draw 3D Models
   public void update()
   { 
-    drawskySphere();
-    drawCrossHair();
-    drawFloor();
-    
-    lights();
-    
-    for(int i=0;i<aimList.size();i++)
+    if(this.gameState == GameState.MENU)
     {
-      emissive(color(80,80,80));
-      aimList.get(i).draw();
-    }
-    
-    if(!this.joyManager.isEmpty())
-    {
-      this.joyManager.update();
-      
-      handleTranslation();
-      handleSight();
- 
-      this.camManager.getMainCam().feed();
-      
-      if(this.joyManager.shootClicked())
+      if(!this.joyManager.isEmpty())
       {
-        Aim currentTarget = currentTarget();
-        if(currentTarget != null)
+        this.joyManager.update();
+        
+        if(this.joyManager.shootClicked())
         {
-          if(currentTarget.getColor().equals(this.joyManager.getAdditiveColorPressed()))
-            destroySphere(currentTarget);
+          if(this.pieMenu.getCurrentOption() == MenuOption.QUIT)
+          {
+            exit();
+          }
+          else if(this.pieMenu.getCurrentOption() == MenuOption.START)
+          {
+            this.gameState = GameState.PLAYING;
+            createRandomAimSphere();
+          }
         }
+        this.pieMenu.draw();
       }
     }
-    else
+    else if(this.gameState == GameState.PLAYING)
     {
-      this.logger.log("Please plug a XBox 360/One joypad and restart the application");
+      drawskySphere();
+      drawCrossHair();
+      drawFloor();
+      
+      lights();
+      
+      for(int i=0;i<aimList.size();i++)
+      {
+        if(aimList.get(i).isDead())
+          destroySphere(aimList.get(i),true);
+      }
+      
+      for(int i=0;i<aimList.size();i++)
+      {
+        emissive(color(80,80,80));
+        aimList.get(i).draw();
+      }
+      
+      if(!this.joyManager.isEmpty())
+      {
+        this.joyManager.update();
+        
+        handleTranslation();
+        handleSight();
+   
+        this.camManager.getMainCam().feed();
+        
+        if(this.joyManager.shootClicked())
+        {
+          Aim currentTarget = currentTarget();
+          if(currentTarget != null)
+          {
+            if(currentTarget.getColor().equals(this.joyManager.getAdditiveColorPressed()))
+              destroySphere(currentTarget,false);
+            else
+              this.score--;
+          }
+          else
+          {
+            this.score--;
+          }
+        }
+      }
+      else
+      {
+        this.logger.log("Please plug a XBox 360/One joypad and restart the application");
+      }
+      
+      drawScore();
     }
-    
-    drawScore();
   }
   
   
@@ -149,10 +191,13 @@ class GameManager
   }
   
   //Remove the aim given in parameter from the aimList
-  private void destroySphere(Aim aim)
+  private void destroySphere(Aim aim, boolean isDead)
   {
-    this.score += millis() - aim.getSpawnTime() > Config.aimLifespan*1000 ? 0 : (Config.aimLifespan*1000 - (millis() - aim.getSpawnTime()))/1000 ;
-    logger.log(score);
+    if(!isDead)
+      this.score += millis() - aim.getSpawnTime() > Config.aimLifespan*1000 ? 0 : (Config.aimLifespan*1000 - (millis() - aim.getSpawnTime()))/1000 ;
+    else
+      this.score -= 1;
+      
     this.aimList.remove(aimList.indexOf(aim));
     createRandomAimSphere();
   }
