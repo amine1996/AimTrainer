@@ -52,7 +52,6 @@ class CameraManager
     return getPlayerPos().sub(getPlayerTarget()).normalize().mult(-1);
   }
  
- 
   public damkjer.ocd.Camera getMainCam()
   {
     return this.mainCam;
@@ -89,7 +88,7 @@ class CameraManager
   private damkjer.ocd.Camera createPlayerCamera()
   {
     final PVector posPlayer = new PVector(0,0,0);
-    final PVector targetPlayer = new PVector(0,0,-Config.sphereRadius/2);
+    final PVector targetPlayer = new PVector(0,0,-Config.skySphereRadius/2);
     final PVector upVectorPlayer = new PVector(0,1,0);
     
     return createCamera(posPlayer,targetPlayer,upVectorPlayer,70,1,1000);
@@ -98,7 +97,7 @@ class CameraManager
   //Create spectator camera with default settings
   private damkjer.ocd.Camera createSpectatorCamera()
   {
-    final PVector posSpectator = new PVector(0,-Config.sphereRadius/2,0);
+    final PVector posSpectator = new PVector(0,-Config.skySphereRadius/2,0);
     final PVector targetSpectator = new PVector(0,0,0.0001);
     final PVector upVectorSpectator = new PVector(0,1,0);
     

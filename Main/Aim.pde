@@ -1,25 +1,30 @@
 class Aim
 {
   //Shape representing the sphere
-  PShape sphere;
+  private PShape sphere;
   
   //Absolute position of the sphere
-  PVector position;
+  private PVector position;
   
   //RGB Vector color of the sphere
-  PVector aimColor;
+  private PVector aimColor;
   
   //Radius of the sphere
-  float radius;
+  private float radius;
+  
+  //When the aim appeared
+  private int spawnTime;
+  
   
   //Constructor initialised with position
   Aim(PVector pPos)
   {
     this.radius = Config.aimRadius;
-    
+    sphereDetail(20);
     this.sphere = createShape(SPHERE,this.radius);
     setRandomColor();
     this.sphere.setStroke(false);
+    this.spawnTime = millis();
     
     this.position = pPos;
   }
@@ -34,6 +39,11 @@ class Aim
     this.sphere.setStroke(false);
     
     this.position = pPos;
+  }
+  
+  public int getSpawnTime()
+  {
+    return this.spawnTime;
   }
   
   //Fill the sphere with a random color

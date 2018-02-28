@@ -4,7 +4,9 @@ class GameManager
   private PApplet appInstance;
   
   //PShape representing the world sphere
-  private PShape worldSphere;
+  private PShape skySphere;
+  
+  private PShape transparentSphere;
   
   //List of aim in the world
   private ArrayList<Aim> aimList;
@@ -17,6 +19,8 @@ class GameManager
   
   private Logger logger;
   
+  private int score;
+  
   //GameManager constructor initalised with instance of main PApplet
   GameManager(Main pInstance)
   {
@@ -24,27 +28,35 @@ class GameManager
     
     this.aimList = new ArrayList<Aim>();
     
-    this.worldSphere = createWorldSphere();
+    this.skySphere = createskySphere();
+
+    this.transparentSphere = createTransparentSphere();
     
     this.camManager = new CameraManager(this.appInstance);
     
     this.joyManager = new JoypadManager(this.appInstance);
     
     this.logger = new Logger("GameManager");
+    
+    this.score = 0;
+    
+    createRandomAimSphere();
   }
   
   //Public methods
   
   //Update all components of the game manager and draw 3D Models
   public void update()
-  {
-
-    drawWorldSphere();
+  { 
+    drawskySphere();
     drawCrossHair();
     drawFloor();
     
+    lights();
+    
     for(int i=0;i<aimList.size();i++)
     {
+      emissive(color(80,80,80));
       aimList.get(i).draw();
     }
     
@@ -54,6 +66,8 @@ class GameManager
       
       handleTranslation();
       handleSight();
+ 
+      this.camManager.getMainCam().feed();
       
       if(this.joyManager.shootClicked())
       {
@@ -64,14 +78,13 @@ class GameManager
             destroySphere(currentTarget);
         }
       }
-      
-      this.camManager.getMainCam().feed();
-      
     }
     else
     {
       this.logger.log("Please plug a XBox 360/One joypad and restart the application");
     }
+    
+    drawScore();
   }
   
   
@@ -132,13 +145,16 @@ class GameManager
   //Return true if the position given in parameter is within the world sphere, with a delta to position if necessary
   private boolean inSphere(PVector pos, float delta)
   {
-    return pow(Config.spherePos.x - pos.x,2) + pow(Config.spherePos.y - pos.y,2) + pow(Config.spherePos.z - pos.z,2) < pow(Config.sphereRadius - delta,2);
+    return pow(Config.spherePos.x - pos.x,2) + pow(Config.spherePos.y - pos.y,2) + pow(Config.spherePos.z - pos.z,2) < pow(Config.skySphereRadius - delta,2);
   }
   
   //Remove the aim given in parameter from the aimList
   private void destroySphere(Aim aim)
   {
+    this.score += millis() - aim.getSpawnTime() > Config.aimLifespan*1000 ? 0 : (Config.aimLifespan*1000 - (millis() - aim.getSpawnTime()))/1000 ;
+    logger.log(score);
     this.aimList.remove(aimList.indexOf(aim));
+    createRandomAimSphere();
   }
   
   //Return the attitude (yaw,pitch,roll) vector that is looking at the position given in parameter
@@ -172,7 +188,7 @@ class GameManager
     spherePos.y = map(spherePos.y,0,1,-1,0);
     spherePos.z = map(spherePos.z,0,1,-1,1);
     
-    spherePos.mult(Config.sphereRadius/2);
+    spherePos.mult(Config.skySphereRadius/2);
     
     if(inSphere(spherePos,Config.aimRadius))
     {
@@ -183,7 +199,7 @@ class GameManager
       this.logger.log("Sphere outside radius, recreating one");
       createRandomAimSphere();
     }
-  } //<>// //<>// //<>// //<>// //<>//
+  } //<>//
   
   //Move the player's camera using the joystick values
   private void handleTranslation()
@@ -194,7 +210,7 @@ class GameManager
     if(abs(leftJoy.x) > 0.1 || abs(leftJoy.y) > 0.1)
     {
       PVector oldTarget = this.camManager.getPlayerTarget();
-      
+          
       playerCam.truck(leftJoy.x);
       playerCam.dolly(leftJoy.y);
          
@@ -230,25 +246,43 @@ class GameManager
   }
 
   //3D methods
-  private PShape createWorldSphere()
+  private PShape createskySphere()
   {
-    PImage skyDome = loadImage("./data/Sky019.jpg");
+    PImage skyDome = loadImage("./data/Space2.png");
     
     sphereDetail(100);
     noStroke();
-    PShape sphere = createShape(SPHERE,Config.sphereRadius);
+    PShape sphere = createShape(SPHERE,Config.skySphereRadius);
     sphere.setTexture(skyDome);
     
     return sphere;
   }
 
+  private PShape createTransparentSphere()
+  {
+    sphereDetail(100);
+    noStroke();
+    PShape sphere = createShape(SPHERE,Config.skySphereRadius);
+    sphere.setFill(color(0,0,200,0));
+    
+    return sphere;
+  }
   
-  //Draw the world sphere
-  private void drawWorldSphere()
+  //Draw the sky sphere
+  private void drawskySphere()
   {
     pushMatrix();
       translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
-      shape(this.worldSphere);
+      shape(this.skySphere);
+    popMatrix();
+  }
+  
+  //Draw the transparent sphere
+  private void drawTransparentSphere()
+  {
+    pushMatrix();
+      translate(Config.spherePos.x,Config.spherePos.y,Config.spherePos.z);
+      shape(this.transparentSphere);
     popMatrix();
   }
   
@@ -269,7 +303,7 @@ class GameManager
       translate(0, 0, -2);
       
       //Dessine la croix
-      fill(0);
+      fill(0);;
       stroke(255,0,0);
       strokeWeight(1);
       line(-0.1,0,0.1,0);
@@ -281,10 +315,47 @@ class GameManager
   private void drawFloor()
   {
     pushMatrix();
-      fill(255);
+      noStroke();
+      fill(color(220,200,255,50));
       translate(0,10,0);
       rotateX(radians(90));
-      ellipse(0,0,Config.sphereRadius*2,Config.sphereRadius*2);
+      ellipse(0,0,Config.skySphereRadius*2,Config.skySphereRadius*2);
+    popMatrix();
+    
+    pushMatrix();
+      stroke(0);
+      fill(0);
+      for(int i=0;i<Config.skySphereRadius*2;i++)
+      {
+        line(-Config.skySphereRadius*2,10,-Config.skySphereRadius*2+i*10,Config.skySphereRadius*2,10,-Config.skySphereRadius*2+i*10);
+        line(-Config.skySphereRadius*2+i*10,10,-Config.skySphereRadius*2,-Config.skySphereRadius*2+i*10,10,Config.skySphereRadius*2);
+      }
     popMatrix();
   }
+  
+  //Draw screen
+  private void drawScore()
+  {
+    final PVector pos = this.camManager.getPlayerPos();
+    final PVector attitude = this.camManager.getPlayerAttitude();
+    final int textSize = 32;
+    final String scoreText = "Score : "+ this.score;
+
+    hint(DISABLE_DEPTH_TEST);
+    pushMatrix();
+      translate(pos.x, pos.y, pos.z);
+      rotateY(attitude.x);  
+      rotateX(-attitude.y);
+      translate(width/3,-height/2.8,-1000);
+      
+      smooth(10);
+      noStroke();
+      
+      textSize(textSize);
+      fill(255);
+      text(scoreText,0,0,0);
+    popMatrix();
+   hint(ENABLE_DEPTH_TEST);
+  }
+  
 }

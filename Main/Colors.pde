@@ -17,7 +17,7 @@ public static class ColorMaker
   private static final Random randomGenerator = new Random();
   
   //Color value when creating color
-  private static final int colorValue = 200;
+  private static final int colorValue = 255;
   
   //Return ArrayList of colors
   public static ArrayList<Colors> getColors()
@@ -28,7 +28,7 @@ public static class ColorMaker
     allColors.add(Colors.BLUE);
     allColors.add(Colors.GREEN);
     allColors.add(Colors.RED);
-    allColors.add(Colors.YELLOW);
+    //allColors.add(Colors.YELLOW);
     
     return allColors;  
   }
@@ -62,8 +62,8 @@ public static class ColorMaker
     
     
     ArrayList<Colors> addition = new ArrayList<Colors>();
-    addition.add(firstColor <= size ? Colors.NONE : getColors().get(firstColor%size));
-    addition.add(secondColor <= size ? Colors.NONE : getColors().get(secondColor%size));
+    addition.add(firstColor <= size/3 ? Colors.NONE : getColors().get(firstColor%size));
+    addition.add(secondColor <= size/3 ? Colors.NONE : getColors().get(secondColor%size));
     
     while(addition.get(0) == addition.get(1))
       addition.set(0,colors.get(randomGenerator.nextInt(size-1)+1));
