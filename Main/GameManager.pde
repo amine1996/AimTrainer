@@ -351,7 +351,9 @@ class GameManager
     }
   }
 
-  //3D methods
+  //3D methods and HUD Methods
+  
+  //Create the skySphere and returns it
   private PShape createskySphere()
   {
     PImage skyDome = loadImage("./data/Space2.png");
@@ -419,6 +421,31 @@ class GameManager
       }
     popMatrix();
   }
+
+  //Draw hurt screen
+  private void drawHurtScreen()
+  {
+    final PVector pos = this.camManager.getPlayerPos();
+    final PVector attitude = this.camManager.getPlayerAttitude();
+    this.hurtScreenOpacity = this.hurtScreenOpacity > 0 ? this.hurtScreenOpacity-2 : 0;
+    
+    pushMatrix();
+      //Positionne la croix sur la caméra
+      translate(pos.x, pos.y, pos.z);
+      //Rotation par rapport à l'axe Y
+      rotateY(attitude.x);  
+      //Rotation par rapport à l'axe X
+      rotateX(-attitude.y);
+      //Pousse la croix de 2 en Z
+      translate(0, 0, -2);
+      
+      //Dessine le rectangle rouge
+      fill(color(255,0,0,this.hurtScreenOpacity));
+      stroke(255,0,0);
+      strokeWeight(1);
+      rect(-100,-100,200,200);
+    popMatrix();
+  }
   
   //Draw HUD text
   private void drawHUDText()
@@ -451,7 +478,7 @@ class GameManager
       sphereHit += "0.00%";
     else
       sphereHit += nf(((this.totalSpheres-1 - this.missedSpheres)/(this.totalSpheres-1))*100,0,2) +"%";
-       
+     
     start += step;
     pushMatrix();
       translate(pos.x, pos.y, pos.z);
@@ -507,30 +534,5 @@ class GameManager
     popMatrix();
     
     hint(ENABLE_DEPTH_TEST);
-  }
-  
-  //Draw hurt screen
-  private void drawHurtScreen()
-  {
-    final PVector pos = this.camManager.getPlayerPos();
-    final PVector attitude = this.camManager.getPlayerAttitude();
-    this.hurtScreenOpacity = this.hurtScreenOpacity > 0 ? this.hurtScreenOpacity-2 : 0;
-    
-    pushMatrix();
-      //Positionne la croix sur la caméra
-      translate(pos.x, pos.y, pos.z);
-      //Rotation par rapport à l'axe Y
-      rotateY(attitude.x);  
-      //Rotation par rapport à l'axe X
-      rotateX(-attitude.y);
-      //Pousse la croix de 2 en Z
-      translate(0, 0, -2);
-      
-      //Dessine le rectangle rouge
-      fill(color(255,0,0,this.hurtScreenOpacity));
-      stroke(255,0,0);
-      strokeWeight(1);
-      rect(-100,-100,200,200);
-    popMatrix();
   }
 }
