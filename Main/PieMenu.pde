@@ -6,24 +6,34 @@ public enum MenuOption
 
 class PieMenu
 {
+  //Background image of the pie menu
   private PImage backgroundImage;
     
+  //Options of the pie menu
   private String[] options = { "Quit", "Start"};
   
+  //Diameter of the pie menu
   private float diam;
   
+  //Text diameter of the pie menu
   private float textdiam;
   
+  //Joypad manager to get joystick values
   private JoypadManager joyManager;
   
+  //Current option selected by the user
   private MenuOption currentOption;
   
+  //Used to log data to console
   private Logger logger;
   
+  //Transparent color
   private color transparent;
   
+  //Semi transparent purple color
   private color semiTransparentPurple;
   
+  //Semi transparent white color
   private color semiTransparentWhite;
 
   PieMenu(JoypadManager pJoyManager)

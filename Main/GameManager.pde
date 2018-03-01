@@ -15,13 +15,46 @@ class GameManager
   //Ued to handle the joystick
   private JoypadManager joyManager;
   
+  //Used to output data to console
   private Logger logger;
   
+  //Total score
   private int score;
   
+  //Number of wrong color shot by the user
+  private float wrongColor;
+  
+  //Number of good color shot by the user
+  private float successColor;
+  
+  //Number of missed shot
+  private float missedShot;
+  
+  //Number of total shots
+  private float totalShot;
+  
+  //Number of spheres that disappeared because of span time
+  private float missedSpheres;
+  
+  //Number of total spheres that appeared
+  private float totalSpheres;
+  
+  //Number of spheres hit with wrong or good color
+  private float hitSpheres;
+  
+  //Current game state, playing or menu
   private GameState gameState;
   
+  //Pie menu to enter the game
   private PieMenu pieMenu;
+  
+  //Floor inner color
+  private color floorInnerColor;
+  
+  //Opacity of the hurt screen
+  private float hurtScreenOpacity;
+  
+  
   
   //GameManager constructor initalised with instance of main PApplet
   GameManager(Main pInstance)
@@ -31,7 +64,7 @@ class GameManager
     this.aimList = new ArrayList<Aim>();
     
     this.skySphere = createskySphere();
-    
+
     this.camManager = new CameraManager(this.appInstance);
     
     this.joyManager = new JoypadManager(this.appInstance);
@@ -43,6 +76,24 @@ class GameManager
     this.gameState = GameState.MENU;
     
     this.pieMenu = new PieMenu(this.joyManager);
+    
+    this.floorInnerColor = color(220,200,255,50);
+    
+    this.hurtScreenOpacity = 0;
+    
+    this.missedSpheres = 0;
+    
+    this.wrongColor = 0;
+    
+    this.successColor = 0;
+    
+    this.missedShot = 0;
+    
+    this.totalShot = 0;
+    
+    this.missedShot = 0;
+    
+    this.hitSpheres = 0;
   }
   
   //Public methods
@@ -67,6 +118,8 @@ class GameManager
             this.gameState = GameState.PLAYING;
             createRandomAimSphere();
           }
+          
+          this.totalShot++;
         }
         this.pieMenu.draw();
       }
@@ -76,6 +129,7 @@ class GameManager
       drawskySphere();
       drawCrossHair();
       drawFloor();
+
       
       lights();
       
@@ -90,7 +144,8 @@ class GameManager
         emissive(color(80,80,80));
         aimList.get(i).draw();
       }
-      
+ 
+      drawHurtScreen();
       if(!this.joyManager.isEmpty())
       {
         this.joyManager.update();
@@ -102,17 +157,25 @@ class GameManager
         
         if(this.joyManager.shootClicked())
         {
+          this.hitSpheres++;
           Aim currentTarget = currentTarget();
           if(currentTarget != null)
           {
             if(currentTarget.getColor().equals(this.joyManager.getAdditiveColorPressed()))
+            {
+              this.successColor++;
               destroySphere(currentTarget,false);
+            }
             else
-              this.score--;
+            {
+              decrementScore();
+              this.wrongColor++;
+            }
           }
           else
           {
-            this.score--;
+            this.missedShot++;
+            decrementScore();
           }
         }
       }
@@ -121,7 +184,7 @@ class GameManager
         this.logger.log("Please plug a XBox 360/One joypad and restart the application");
       }
       
-      drawScore();
+      drawHUDText();
     }
   }
   
@@ -153,6 +216,12 @@ class GameManager
     return currentTarget;
   }
   
+  private void decrementScore()
+  {
+    this.score--;
+    this.hurtScreenOpacity = 100;
+  }
+  
   //Returns true if the player is looking at the sphere given in parameter
   private boolean isLookingAtSphere(Aim aim)
   {
@@ -179,20 +248,26 @@ class GameManager
   private void destroySphere(Aim aim, boolean isDead)
   {
     if(!isDead)
+    {
       this.score += millis() - aim.getSpawnTime() > Config.aimLifespan*1000 ? 0 : (Config.aimLifespan*1000 - (millis() - aim.getSpawnTime()))/1000 ;
+    }
     else
-      this.score -= 1;
+    {
+      this.missedSpheres++;
+      decrementScore();
+    }
       
     this.aimList.remove(aimList.indexOf(aim));
     createRandomAimSphere();
+    
   }
   
   //Return the attitude (yaw,pitch,roll) vector that is looking at the position given in parameter
-  private PVector getAttitudeToPos(PVector pos)
+  private PVector getAttitudeToPos(PVector origin, PVector pos)
   {
-    final PVector playerPos = this.camManager.getPlayerPos();
+    final PVector originPos = origin.copy();
     final PVector lookAt = pos;
-    final PVector delta = playerPos.sub(lookAt);
+    final PVector delta = PVector.sub(originPos,lookAt);
     
     PVector correctAtt = new PVector(0,0);
     correctAtt.x = delta.x < 0 ? atan2(delta.x,delta.z) + 2*PI : atan2(delta.x,delta.z);
@@ -223,6 +298,7 @@ class GameManager
     if(inSphere(spherePos,Config.aimRadius))
     {
       this.aimList.add(new Aim(spherePos));
+      this.totalSpheres++;
     }
     else
     {
@@ -326,16 +402,16 @@ class GameManager
   private void drawFloor()
   {
     pushMatrix();
-      noStroke();
-      fill(color(220,200,255,50));
       translate(0,10,0);
       rotateX(radians(90));
+      noStroke();
+      fill(this.floorInnerColor);
       ellipse(0,0,Config.skySphereRadius*2,Config.skySphereRadius*2);
     popMatrix();
-    
+
+    stroke(0,0,0,100);
+    fill(0,0,0,100);
     pushMatrix();
-      stroke(0);
-      fill(0);
       for(int i=0;i<Config.skySphereRadius*2;i++)
       {
         line(-Config.skySphereRadius*2,10,-Config.skySphereRadius*2+i*10,Config.skySphereRadius*2,10,-Config.skySphereRadius*2+i*10);
@@ -344,29 +420,117 @@ class GameManager
     popMatrix();
   }
   
-  //Draw screen
-  private void drawScore()
+  //Draw HUD text
+  private void drawHUDText()
   {
     final PVector pos = this.camManager.getPlayerPos();
     final PVector attitude = this.camManager.getPlayerAttitude();
     final int textSize = 32;
+    float step = 0.3;
+    float start = 2.8;
+    
+    textAlign(LEFT);
+    
     final String scoreText = "Score : "+ this.score;
-
     hint(DISABLE_DEPTH_TEST);
     pushMatrix();
       translate(pos.x, pos.y, pos.z);
       rotateY(attitude.x);  
       rotateX(-attitude.y);
-      translate(width/3,-height/2.8,-1000);
-      
-      smooth(10);
+      translate(width/4,-height/start,-1000);
+
       noStroke();
       
       textSize(textSize);
       fill(255);
       text(scoreText,0,0,0);
     popMatrix();
-   hint(ENABLE_DEPTH_TEST);
+    
+    String sphereHit = "Spheres hit : ";
+    if(this.totalSpheres-1 == 0)
+      sphereHit += "0.00%";
+    else
+      sphereHit += nf(((this.totalSpheres-1 - this.missedSpheres)/(this.totalSpheres-1))*100,0,2) +"%";
+       
+    start += step;
+    pushMatrix();
+      translate(pos.x, pos.y, pos.z);
+      rotateY(attitude.x);  
+      rotateX(-attitude.y);
+      translate(width/4,-height/start,-1000);
+
+      noStroke();
+      
+      textSize(textSize);
+      fill(255);
+      text(sphereHit,0,0,0);
+    popMatrix();
+    
+    String missedColors = "Wrong color : ";
+    if(this.wrongColor == 0 || this.successColor == 0)
+      missedColors += "0.00%";
+    else
+      missedColors += nf((this.wrongColor/(this.successColor+1))*100,0,2) +"%";
+       
+    start += step;
+    pushMatrix();
+      translate(pos.x, pos.y, pos.z);
+      rotateY(attitude.x);  
+      rotateX(-attitude.y);
+      translate(width/4,-height/start,-1000);
+
+      noStroke();
+      
+      textSize(textSize);
+      fill(255);
+      text(missedColors,0,0,0);
+    popMatrix();
+    
+    String missedShot = "Missed shot : ";
+    if(this.missedShot == 0 || this.hitSpheres == 0)
+      missedShot += "0.00%";
+    else
+      missedShot += nf((this.missedShot/this.hitSpheres)*100,0,2) +"%";
+      
+    start+=step;
+    pushMatrix();
+      translate(pos.x, pos.y, pos.z);
+      rotateY(attitude.x);  
+      rotateX(-attitude.y);
+      translate(width/4,-height/start,-1000);
+
+      noStroke();
+      
+      textSize(textSize);
+      fill(255);
+      text(missedShot,0,0,0);
+    popMatrix();
+    
+    hint(ENABLE_DEPTH_TEST);
   }
   
+  //Draw hurt screen
+  private void drawHurtScreen()
+  {
+    final PVector pos = this.camManager.getPlayerPos();
+    final PVector attitude = this.camManager.getPlayerAttitude();
+    this.hurtScreenOpacity = this.hurtScreenOpacity > 0 ? this.hurtScreenOpacity-2 : 0;
+    
+    pushMatrix();
+      //Positionne la croix sur la caméra
+      translate(pos.x, pos.y, pos.z);
+      //Rotation par rapport à l'axe Y
+      rotateY(attitude.x);  
+      //Rotation par rapport à l'axe X
+      rotateX(-attitude.y);
+      //Pousse la croix de 2 en Z
+      translate(0, 0, -2);
+      
+      //Dessine le rectangle rouge
+      fill(color(255,0,0,this.hurtScreenOpacity));
+      stroke(255,0,0);
+      strokeWeight(1);
+      rect(-100,-100,200,200);
+    popMatrix();
+  }
 }
