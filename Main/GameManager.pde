@@ -499,12 +499,12 @@ class GameManager
     else
       missedColors += nf((this.wrongColor/(this.successColor+1))*100,0,2) +"%";
        
-    start += step;
+    start += step+0.05;
     pushMatrix();
       translate(pos.x, pos.y, pos.z);
       rotateY(attitude.x);  
       rotateX(-attitude.y);
-      translate(width/4,-height/start,-1000);
+      translate(width/4,-height/start+0.2,-1000);
 
       noStroke();
       
@@ -519,7 +519,7 @@ class GameManager
     else
       missedShot += nf((this.missedShot/this.hitSpheres)*100,0,2) +"%";
       
-    start+=step;
+    start+=step+0.1;
     pushMatrix();
       translate(pos.x, pos.y, pos.z);
       rotateY(attitude.x);  
