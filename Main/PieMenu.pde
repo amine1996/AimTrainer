@@ -43,6 +43,7 @@ class PieMenu
     this.joyManager = pJoyManager;
     
     this.backgroundImage = loadImage("./data/MenuBackground.jpg");
+    this.backgroundImage.resize(width, height);
     
     this.currentOption = MenuOption.START;
     
